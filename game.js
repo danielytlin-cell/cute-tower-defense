@@ -23,12 +23,46 @@ const ui = {
   endKicker: document.getElementById("endKicker"),
   endTitle: document.getElementById("endTitle"),
   endText: document.getElementById("endText"),
+  finalStats: document.getElementById("finalStats"),
+  scoreForm: document.getElementById("scoreForm"),
+  playerName: document.getElementById("playerName"),
+  leaderboard: document.getElementById("leaderboard"),
   restart: document.getElementById("restart"),
 };
 
 const W = 1280;
 const H = 760;
 const TAU = Math.PI * 2;
+const LEADERBOARD_KEY = "bloomguard.leaderboard.v1";
+const enemyPortraitFiles = [
+  "assets/enemy-1.png",
+  "assets/enemy-2.png",
+  "assets/enemy-3.png",
+  "assets/enemy-4.png",
+];
+const enemyPortraits = enemyPortraitFiles.map((src) => {
+  const img = new Image();
+  img.src = src;
+  img.onerror = () => {
+    img.failed = true;
+  };
+  return img;
+});
+const enemyPortraitByType = {
+  sprout: 2,
+  skitter: 3,
+  brute: 0,
+  flyer: 1,
+  shield: 3,
+  elite: 0,
+  boss: 1,
+};
+const fallbackPortraits = [
+  { label: "1", skin: "#d9a384", hair: "#1c1417", accent: "#26345f" },
+  { label: "2", skin: "#d99a6f", hair: "#141414", accent: "#f5f7fb" },
+  { label: "3", skin: "#d8b48c", hair: "#d9d9d9", accent: "#8f6c3a" },
+  { label: "4", skin: "#d89a76", hair: "#161616", accent: "#6e9b5b" },
+];
 
 const stageLayouts = [
   {
@@ -44,7 +78,7 @@ const stageLayouts = [
       { x: 620, y: 252 }, { x: 650, y: 465 }, { x: 800, y: 232 }, { x: 930, y: 560 },
       { x: 1008, y: 312 }, { x: 1120, y: 610 }, { x: 225, y: 410 }, { x: 540, y: 560 },
       { x: 108, y: 265 }, { x: 448, y: 350 }, { x: 878, y: 330 }, { x: 1185, y: 420 },
-      { x: 255, y: 365 }, { x: 735, y: 430 },
+      { x: 255, y: 365 }, { x: 735, y: 430 }, { x: 352, y: 180 }, { x: 980, y: 510 },
     ],
   },
   {
@@ -60,7 +94,7 @@ const stageLayouts = [
       { x: 545, y: 85 }, { x: 650, y: 285 }, { x: 795, y: 455 }, { x: 875, y: 235 },
       { x: 1035, y: 390 }, { x: 1135, y: 590 }, { x: 575, y: 510 }, { x: 1010, y: 645 },
       { x: 145, y: 535 }, { x: 360, y: 420 }, { x: 720, y: 255 }, { x: 960, y: 520 },
-      { x: 235, y: 185 }, { x: 805, y: 455 },
+      { x: 235, y: 185 }, { x: 805, y: 455 }, { x: 720, y: 160 }, { x: 1100, y: 430 },
     ],
   },
   {
@@ -76,7 +110,7 @@ const stageLayouts = [
       { x: 505, y: 210 }, { x: 650, y: 300 }, { x: 745, y: 505 }, { x: 820, y: 150 },
       { x: 970, y: 390 }, { x: 1125, y: 330 }, { x: 1160, y: 610 }, { x: 595, y: 575 },
       { x: 160, y: 365 }, { x: 400, y: 555 }, { x: 735, y: 315 }, { x: 1055, y: 505 },
-      { x: 545, y: 455 }, { x: 880, y: 250 },
+      { x: 545, y: 455 }, { x: 880, y: 250 }, { x: 250, y: 175 }, { x: 925, y: 200 },
     ],
   },
   {
@@ -92,7 +126,7 @@ const stageLayouts = [
       { x: 555, y: 405 }, { x: 645, y: 615 }, { x: 745, y: 425 }, { x: 820, y: 210 },
       { x: 980, y: 250 }, { x: 1060, y: 610 }, { x: 1135, y: 395 }, { x: 545, y: 185 },
       { x: 185, y: 360 }, { x: 505, y: 600 }, { x: 715, y: 260 }, { x: 980, y: 500 },
-      { x: 305, y: 420 }, { x: 885, y: 450 },
+      { x: 305, y: 420 }, { x: 885, y: 450 }, { x: 360, y: 260 }, { x: 1160, y: 600 },
     ],
   },
   {
@@ -108,7 +142,7 @@ const stageLayouts = [
       { x: 515, y: 380 }, { x: 610, y: 150 }, { x: 705, y: 360 }, { x: 790, y: 535 },
       { x: 895, y: 320 }, { x: 1015, y: 470 }, { x: 1120, y: 610 }, { x: 610, y: 555 },
       { x: 145, y: 610 }, { x: 545, y: 205 }, { x: 835, y: 360 }, { x: 1015, y: 615 },
-      { x: 300, y: 390 }, { x: 735, y: 250 },
+      { x: 300, y: 390 }, { x: 735, y: 250 }, { x: 445, y: 185 }, { x: 1070, y: 430 },
     ],
   },
   {
@@ -124,7 +158,39 @@ const stageLayouts = [
       { x: 535, y: 360 }, { x: 640, y: 135 }, { x: 745, y: 330 }, { x: 850, y: 105 },
       { x: 925, y: 535 }, { x: 1045, y: 290 }, { x: 1140, y: 470 }, { x: 680, y: 585 },
       { x: 215, y: 305 }, { x: 500, y: 565 }, { x: 790, y: 135 }, { x: 1010, y: 505 },
-      { x: 575, y: 290 }, { x: 900, y: 310 },
+      { x: 575, y: 290 }, { x: 900, y: 310 }, { x: 315, y: 160 }, { x: 770, y: 465 },
+    ],
+  },
+  {
+    ground: ["#bddf8b", "#70b965"],
+    river: "bottom",
+    path: [
+      { x: -50, y: 225 }, { x: 145, y: 220 }, { x: 260, y: 355 }, { x: 405, y: 300 },
+      { x: 545, y: 405 }, { x: 690, y: 245 }, { x: 830, y: 300 }, { x: 915, y: 470 },
+      { x: 1085, y: 430 }, { x: 1330, y: 540 },
+    ],
+    spots: [
+      { x: 120, y: 120 }, { x: 165, y: 345 }, { x: 285, y: 245 }, { x: 345, y: 425 },
+      { x: 430, y: 205 }, { x: 505, y: 505 }, { x: 575, y: 300 }, { x: 640, y: 160 },
+      { x: 735, y: 355 }, { x: 795, y: 210 }, { x: 850, y: 380 }, { x: 955, y: 560 },
+      { x: 1010, y: 345 }, { x: 1115, y: 520 }, { x: 1185, y: 455 }, { x: 230, y: 475 },
+      { x: 360, y: 190 }, { x: 690, y: 465 }, { x: 875, y: 215 }, { x: 1045, y: 555 },
+    ],
+  },
+  {
+    ground: ["#b3e6c9", "#63b989"],
+    river: "left",
+    path: [
+      { x: -50, y: 500 }, { x: 170, y: 455 }, { x: 250, y: 250 }, { x: 405, y: 250 },
+      { x: 515, y: 410 }, { x: 675, y: 390 }, { x: 775, y: 190 }, { x: 950, y: 245 },
+      { x: 1025, y: 420 }, { x: 1330, y: 455 },
+    ],
+    spots: [
+      { x: 105, y: 590 }, { x: 150, y: 350 }, { x: 245, y: 535 }, { x: 300, y: 165 },
+      { x: 365, y: 345 }, { x: 460, y: 155 }, { x: 500, y: 315 }, { x: 565, y: 520 },
+      { x: 650, y: 300 }, { x: 720, y: 490 }, { x: 780, y: 315 }, { x: 845, y: 105 },
+      { x: 925, y: 350 }, { x: 1010, y: 235 }, { x: 1110, y: 500 }, { x: 1175, y: 360 },
+      { x: 205, y: 245 }, { x: 430, y: 430 }, { x: 760, y: 115 }, { x: 1065, y: 325 },
     ],
   },
 ];
@@ -155,6 +221,10 @@ const towerTypes = {
     name: "Fire", icon: "♨", color: "#ff826f", unlock: 5, cost: 145, range: 142,
     fireRate: 0.66, damage: 14, burn: 34, burnTime: 3.1, projectile: "fire", desc: "Fast burns",
   },
+  grenade: {
+    name: "Grenade", icon: "G", color: "#8fd16a", unlock: 4, cost: 160, range: 168,
+    fireRate: 1.08, damage: 82, splash: 130, projectile: "grenade", desc: "Huge blasts",
+  },
   crystal: {
     name: "Crystal", icon: "◆", color: "#79d6ff", unlock: 5, cost: 230, range: 190,
     fireRate: 0.38, damage: 20, beam: true, targetsFlying: true, desc: "Bright beam",
@@ -179,9 +249,11 @@ const stages = [
   { name: "Sunny Stump", lives: 20, coins: 145, unlockText: "Archer towers ready", waves: [["sprout", 8], ["sprout", 12], ["sprout", 10, "skitter", 4], ["sprout", 18, "skitter", 8]] },
   { name: "Pebble Bend", lives: 20, coins: 165, unlockText: "Cannon tower unlocked", waves: [["sprout", 12, "skitter", 8], ["skitter", 16], ["sprout", 18, "skitter", 12], ["brute", 4, "skitter", 16]] },
   { name: "Frost Ferns", lives: 22, coins: 190, unlockText: "Frost tower unlocked", waves: [["brute", 7, "sprout", 14], ["shield", 7, "skitter", 12], ["brute", 9, "shield", 8], ["brute", 12, "shield", 10, "skitter", 18]] },
-  { name: "Skycap Grove", lives: 22, coins: 210, unlockText: "Lightning tower unlocked", waves: [["flyer", 10, "sprout", 12], ["flyer", 16, "skitter", 14], ["flyer", 18, "shield", 10], ["flyer", 24, "brute", 9, "shield", 10]] },
-  { name: "Castle Picnic", lives: 24, coins: 260, unlockText: "Fire and crystal towers unlocked", waves: [["elite", 4, "flyer", 8], ["shield", 16, "brute", 14], ["elite", 12, "flyer", 24], ["boss", 1, "elite", 14, "flyer", 18]] },
+  { name: "Skycap Grove", lives: 22, coins: 210, unlockText: "Lightning and grenade towers unlocked", waves: [["flyer", 10, "sprout", 12], ["flyer", 16, "skitter", 14], ["flyer", 18, "shield", 10], ["flyer", 24, "brute", 9, "shield", 10]] },
+  { name: "Castle Picnic", lives: 24, coins: 340, unlockText: "Fire and crystal towers unlocked", waves: [["elite", 4, "flyer", 8], ["shield", 16, "brute", 14], ["elite", 12, "flyer", 24], ["boss", 1, "elite", 14, "flyer", 18]] },
   { name: "Gearflower Vale", lives: 24, coins: 300, unlockText: "Mechanical turret unlocked", waves: [["elite", 18, "flyer", 24], ["boss", 1, "shield", 24], ["elite", 28, "brute", 24, "flyer", 28], ["boss", 2, "elite", 24, "flyer", 34]] },
+  { name: "Boomcap Orchard", lives: 25, coins: 330, unlockText: "Boomcap boss waves unlocked", waves: [["shield", 18, "elite", 12], ["brute", 20, "flyer", 26], ["elite", 26, "shield", 24, "skitter", 24], ["boss", 2, "elite", 28, "flyer", 30]] },
+  { name: "Moonwheel Keep", lives: 26, coins: 360, unlockText: "Final keep defense", waves: [["elite", 30, "flyer", 32], ["boss", 2, "shield", 30, "brute", 22], ["elite", 36, "flyer", 40, "shield", 30], ["boss", 3, "elite", 34, "flyer", 44]] },
 ];
 
 const state = {
@@ -207,41 +279,15 @@ const state = {
   mouse: { x: -999, y: -999 },
   stagePicker: true,
   gameEnded: false,
-  score: 0,
-  enemiesSpawned: 0,
-  enemiesKilled: 0,
-  stageScoreStart: 0,
-  stageSpawnedStart: 0,
-  stageKilledStart: 0,
+  runKilled: 0,
+  runTotal: 0,
+  stageKilled: 0,
+  stageTotal: 0,
+  stageTallied: [],
+  finalScore: 0,
 };
 
 let nextEnemyId = 1;
-
-function resetRunStats() {
-  state.score = 0;
-  state.enemiesSpawned = 0;
-  state.enemiesKilled = 0;
-  state.stageScoreStart = 0;
-  state.stageSpawnedStart = 0;
-  state.stageKilledStart = 0;
-}
-
-function rememberStageStats() {
-  state.stageScoreStart = state.score;
-  state.stageSpawnedStart = state.enemiesSpawned;
-  state.stageKilledStart = state.enemiesKilled;
-}
-
-function rewindStageStats() {
-  state.score = state.stageScoreStart;
-  state.enemiesSpawned = state.stageSpawnedStart;
-  state.enemiesKilled = state.stageKilledStart;
-}
-
-function killPercent() {
-  if (!state.enemiesSpawned) return 100;
-  return Math.round((state.enemiesKilled / state.enemiesSpawned) * 1000) / 10;
-}
 
 const audio = {
   ctx: null,
@@ -403,6 +449,71 @@ function currentStage() {
   return stages[state.stageIndex];
 }
 
+function resetRunStats() {
+  state.runKilled = 0;
+  state.runTotal = 0;
+  state.stageKilled = 0;
+  state.stageTotal = 0;
+  state.stageTallied = Array(stages.length).fill(false);
+  state.finalScore = 0;
+}
+
+function tallyCurrentStage() {
+  if (state.stageTallied[state.stageIndex]) return;
+  state.runKilled += state.stageKilled;
+  state.runTotal += state.stageTotal;
+  state.stageTallied[state.stageIndex] = true;
+}
+
+function calculateFinalScore() {
+  const killPct = state.runTotal ? state.runKilled / state.runTotal : 0;
+  return Math.round(
+    state.runKilled * 100 +
+    state.coins * 6 +
+    state.lives * 350 +
+    Math.round(killPct * 5000)
+  );
+}
+
+function loadLeaderboard() {
+  try {
+    const scores = JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || "[]");
+    return Array.isArray(scores)
+      ? scores.filter((s) => s && s.name && Number.isFinite(s.score)).sort((a, b) => b.score - a.score).slice(0, 10)
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveLeaderboard(scores) {
+  localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(scores.slice(0, 10)));
+}
+
+function isTopScore(score) {
+  const scores = loadLeaderboard();
+  return scores.length < 10 || score > scores[scores.length - 1].score;
+}
+
+function renderLeaderboard(scores = loadLeaderboard()) {
+  if (!ui.leaderboard) return;
+  ui.leaderboard.classList.remove("hidden");
+  const rows = scores.length
+    ? scores.map((entry) => `<li><strong>${escapeHtml(entry.name)}</strong> - ${entry.score.toLocaleString()} <small>${entry.killPct}% eliminated</small></li>`).join("")
+    : "<li>No champions yet</li>";
+  ui.leaderboard.innerHTML = `<h3>Leaderboard by Score</h3><ol>${rows}</ol>`;
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (ch) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "\"": "&quot;",
+    "'": "&#39;",
+  }[ch]));
+}
+
 function availableTowers() {
   return Object.entries(towerTypes).filter(([, t]) => t.unlock <= state.stageIndex + 1);
 }
@@ -411,7 +522,6 @@ function resetForStage(index) {
   const st = stages[index];
   state.stageIndex = index;
   setStageLayout(index);
-  rememberStageStats();
   state.lives = st.lives;
   state.coins = st.coins + Math.max(0, index - 1) * 25;
   state.waveIndex = 0;
@@ -422,12 +532,18 @@ function resetForStage(index) {
   state.floaters = [];
   state.spawnQueue = [];
   state.waveActive = false;
+  state.spawnTimer = 0;
+  state.stageKilled = 0;
+  state.stageTotal = 0;
   state.selectedTower = null;
   state.selectedTowerType = availableTowers()[0][0];
   state.placing = true;
   state.gameEnded = false;
   state.paused = false;
   ui.gameOver.classList.add("hidden");
+  ui.scoreForm?.classList.add("hidden");
+  ui.finalStats?.classList.add("hidden");
+  ui.leaderboard?.classList.add("hidden");
   updateUi();
   renderTowerButtons();
   showToast(st.unlockText);
@@ -436,7 +552,6 @@ function resetForStage(index) {
 function restartCurrentStage() {
   const keepMaxStage = state.maxStage;
   const stage = state.stageIndex;
-  rewindStageStats();
   resetForStage(stage);
   state.maxStage = keepMaxStage;
   state.stagePicker = false;
@@ -481,7 +596,6 @@ function spawnEnemy(type) {
   const base = enemyTypes[type];
   const stageScale = 1 + state.stageIndex * 0.22;
   const hp = Math.round(base.hp * stageScale * (base.boss ? 1 + state.stageIndex * 0.15 : 1));
-  state.enemiesSpawned++;
   const e = {
     id: `enemy-${nextEnemyId++}`,
     type,
@@ -506,6 +620,7 @@ function spawnEnemy(type) {
     wobble: Math.random() * TAU,
     hitFlash: 0,
   };
+  state.stageTotal++;
   state.enemies.push(e);
 }
 
@@ -521,11 +636,9 @@ function damageEnemy(enemy, amount, source = "magic") {
 function defeatEnemy(enemy) {
   if (!state.enemies.includes(enemy)) return;
   state.enemies = state.enemies.filter((e) => e !== enemy);
-  const scoreValue = Math.round(enemy.reward * 10 + enemy.maxHp * 0.35 + (enemy.boss ? 500 : 0));
+  state.stageKilled++;
   state.coins += enemy.reward;
-  state.enemiesKilled++;
-  state.score += scoreValue;
-  addFloater(enemy.x, enemy.y - 24, `+${enemy.reward}  +${scoreValue} pts`, "#ffe176");
+  addFloater(enemy.x, enemy.y - 24, `+${enemy.reward}`, "#ffe176");
   burst(enemy.x, enemy.y, enemy.boss ? 32 : 14, enemy.color);
   audio.sfx(enemy.boss ? "clear" : "defeat");
   updateUi();
@@ -659,7 +772,7 @@ function fireTower(tower, target) {
     x: tower.x,
     y: tower.y - 24,
     target,
-    speed: def.projectile === "shell" ? 430 : 620,
+    speed: def.projectile === "shell" || def.projectile === "grenade" ? 430 : 620,
     damage: stats.damage,
     splash: stats.splash,
     slow: def.slow,
@@ -669,7 +782,7 @@ function fireTower(tower, target) {
     source: tower.type === "archer" ? "basic" : "magic",
     color: def.color,
   });
-  audio.sfx(tower.type === "cannon" ? "cannon" : tower.type === "frost" ? "frost" : tower.type === "archer" ? "arrow" : "hit");
+  audio.sfx(tower.type === "cannon" || tower.type === "grenade" ? "cannon" : tower.type === "frost" ? "frost" : tower.type === "archer" ? "arrow" : "hit");
 }
 
 function hitProjectile(p) {
@@ -690,7 +803,7 @@ function hitProjectile(p) {
         }
       }
     }
-    burst(x, y, p.kind === "frost" ? 24 : 18, p.color);
+    burst(x, y, p.kind === "frost" ? 24 : p.kind === "grenade" ? 30 : 18, p.color);
   } else {
     damageEnemy(p.target, p.damage, p.source);
     if (p.burn) {
@@ -791,10 +904,7 @@ function update(dt) {
   if (state.waveActive && !state.spawnQueue.length && state.enemies.length === 0) {
     state.waveActive = false;
     state.waveIndex++;
-    const clearBonus = 75 + state.stageIndex * 30;
     state.coins += 35 + state.stageIndex * 12;
-    state.score += clearBonus;
-    addFloater(W - 185, 110, `Wave clear +${clearBonus}`, "#ffffff");
     audio.sfx("coin");
     if (state.waveIndex >= currentStage().waves.length) {
       stageClear();
@@ -807,12 +917,11 @@ function update(dt) {
 
 function stageClear() {
   audio.sfx("clear");
+  tallyCurrentStage();
   const nextStage = Math.min(stages.length - 1, state.stageIndex + 1);
-  const stageBonus = 350 + state.stageIndex * 140 + Math.max(0, state.lives) * 25;
-  state.score += stageBonus;
   state.maxStage = Math.max(state.maxStage, nextStage);
   if (state.stageIndex >= stages.length - 1) return endGame(true);
-  showToast(`Stage clear! +${stageBonus} pts. ${stages[nextStage].unlockText}`);
+  showToast(`Stage clear! ${stages[nextStage].unlockText}`);
   state.stageIndex = nextStage;
   state.stagePicker = true;
   setTimeout(() => openStageMap(), 950);
@@ -823,9 +932,27 @@ function endGame(won) {
   ui.gameOver.classList.remove("hidden");
   ui.endKicker.textContent = won ? "Bloomguard is safe and sparkling" : "The gate needs patching";
   ui.endTitle.textContent = won ? "Adventure Complete" : "Game Over";
-  ui.endText.textContent = won
-    ? `Final score: ${state.score.toLocaleString()} pts. Enemy kill rate: ${killPercent()}% (${state.enemiesKilled}/${state.enemiesSpawned}).`
-    : `Too many mischievous visitors reached the castle gate. Score: ${state.score.toLocaleString()} pts. Enemy kill rate: ${killPercent()}% (${state.enemiesKilled}/${state.enemiesSpawned}).`;
+  ui.endText.textContent = won ? "You cleared all 8 stages. Your final score and enemy elimination rate are below." : "Too many mischievous visitors reached the castle gate.";
+  ui.scoreForm?.classList.add("hidden");
+  if (won) {
+    state.finalScore = calculateFinalScore();
+    const killPct = state.runTotal ? Math.round((state.runKilled / state.runTotal) * 100) : 0;
+    ui.finalStats.classList.remove("hidden");
+    ui.finalStats.innerHTML = `
+      <div><span>Your Score</span>${state.finalScore.toLocaleString()}</div>
+      <div><span>Enemies</span>${state.runKilled}/${state.runTotal}</div>
+      <div><span>Eliminated</span>${killPct}%</div>
+    `;
+    renderLeaderboard();
+    if (isTopScore(state.finalScore)) {
+      ui.scoreForm.classList.remove("hidden");
+      ui.playerName.value = "";
+      setTimeout(() => ui.playerName.focus(), 50);
+    }
+  } else {
+    ui.finalStats?.classList.add("hidden");
+    renderLeaderboard();
+  }
   audio.sfx(won ? "clear" : "over");
 }
 
@@ -1247,6 +1374,18 @@ function drawTower(t) {
   if (t.type === "cannon") {
     ctx.rotate(t.angle);
     drawRoundedRect(-4, -10, 46, 20, 8);
+  } else if (t.type === "grenade") {
+    ctx.rotate(t.angle);
+    drawRoundedRect(-10, -12, 40, 24, 8);
+    ctx.beginPath();
+    ctx.arc(34, 0, 13, 0, TAU);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = "#fff0a6";
+    ctx.beginPath();
+    ctx.arc(-14, 0, 9, 0, TAU);
+    ctx.fill();
+    ctx.stroke();
   } else if (t.type === "crystal") {
     ctx.beginPath();
     ctx.moveTo(0, -52);
@@ -1290,7 +1429,16 @@ function drawTower(t) {
   }
 }
 
+function getEnemyPortrait(enemy) {
+  const index = enemyPortraitByType[enemy.type] ?? 0;
+  const img = enemyPortraits[index];
+  return img && img.complete && !img.failed && img.naturalWidth > 0 ? img : null;
+}
+
 function drawEnemy(e) {
+  drawEnemyPortrait(e, getEnemyPortrait(e));
+  return;
+
   ctx.save();
   ctx.translate(e.x, e.y);
   if (e.kind === "ground") ctx.rotate(Math.sin(e.wobble) * 0.08);
@@ -1359,6 +1507,123 @@ function drawEnemy(e) {
   ctx.fillRect(e.x - w / 2, e.y - (e.boss ? 62 : 42), w * clamp(e.hp / e.maxHp, 0, 1), 7);
 }
 
+function drawEnemyPortrait(e, img) {
+  const portraitIndex = enemyPortraitByType[e.type] ?? 0;
+  const fallback = fallbackPortraits[portraitIndex];
+  const bob = Math.sin(e.wobble) * (e.kind === "flying" ? 5 : 2);
+  const radius = e.boss ? 56 : e.type === "brute" ? 42 : 34;
+  const y = e.y + bob;
+
+  ctx.save();
+  ctx.fillStyle = "rgba(46, 39, 27, 0.2)";
+  ctx.beginPath();
+  ctx.ellipse(e.x, e.y + radius * 0.78, radius * 0.9, radius * 0.3, 0, 0, TAU);
+  ctx.fill();
+
+  if (e.kind === "flying") {
+    ctx.fillStyle = "#e8f9ff";
+    ctx.strokeStyle = "#5f7f89";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.ellipse(e.x - radius * 0.8, y, radius * 0.55, radius * 0.28, Math.sin(e.wobble) * 0.4, 0, TAU);
+    ctx.ellipse(e.x + radius * 0.8, y, radius * 0.55, radius * 0.28, -Math.sin(e.wobble) * 0.4, 0, TAU);
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(e.x, y, radius + 5, 0, TAU);
+  ctx.clip();
+  if (img) {
+    drawPortraitImageCover(img, e.x, y, radius + 5);
+  } else {
+    drawFallbackPortrait(e.x, y, radius + 5, fallback);
+  }
+  if (e.hitFlash > 0) {
+    ctx.globalAlpha = 0.35;
+    ctx.fillStyle = "#fff7d5";
+    ctx.fillRect(e.x - radius - 5, y - radius - 5, (radius + 5) * 2, (radius + 5) * 2);
+    ctx.globalAlpha = 1;
+  }
+  ctx.restore();
+
+  ctx.lineWidth = e.boss ? 6 : 4;
+  ctx.strokeStyle = e.slow < 1 ? "#dffbff" : e.boss ? "#6d4a22" : "#222629";
+  ctx.beginPath();
+  ctx.arc(e.x, y, radius + 2, 0, TAU);
+  ctx.stroke();
+
+  if (e.armor || e.resistBasic) {
+    ctx.strokeStyle = "rgba(230,245,255,0.85)";
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.arc(e.x, y, radius + 8, Math.PI * 0.15, Math.PI * 0.85);
+    ctx.stroke();
+  }
+
+  if (e.burnTimer > 0) {
+    ctx.fillStyle = "#ffb13b";
+    ctx.beginPath();
+    ctx.arc(e.x + radius * 0.48, y - radius * 0.82, 6 + Math.sin(e.wobble) * 2, 0, TAU);
+    ctx.fill();
+  }
+  ctx.restore();
+
+  const w = e.boss ? 88 : e.type === "brute" ? 58 : 50;
+  ctx.fillStyle = "rgba(70,40,30,0.38)";
+  ctx.fillRect(e.x - w / 2, e.y - (e.boss ? 88 : e.type === "brute" ? 64 : 56), w, 7);
+  ctx.fillStyle = e.hp / e.maxHp > 0.45 ? "#7ee05f" : "#f0735f";
+  ctx.fillRect(e.x - w / 2, e.y - (e.boss ? 88 : e.type === "brute" ? 64 : 56), w * clamp(e.hp / e.maxHp, 0, 1), 7);
+}
+
+function drawPortraitImageCover(img, x, y, radius) {
+  const naturalWidth = img.naturalWidth || img.width;
+  const naturalHeight = img.naturalHeight || img.height;
+  const sourceSize = Math.min(naturalWidth, naturalHeight);
+  const sx = Math.max(0, (naturalWidth - sourceSize) / 2);
+  const sy = 0;
+  ctx.drawImage(img, sx, sy, sourceSize, sourceSize, x - radius, y - radius, radius * 2, radius * 2);
+}
+
+function drawFallbackPortrait(x, y, radius, portrait) {
+  const grad = ctx.createLinearGradient(x - radius, y - radius, x + radius, y + radius);
+  grad.addColorStop(0, "#fff2d3");
+  grad.addColorStop(1, portrait.skin);
+  ctx.fillStyle = grad;
+  ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+
+  ctx.fillStyle = portrait.hair;
+  ctx.beginPath();
+  ctx.ellipse(x, y - radius * 0.48, radius * 0.78, radius * 0.38, 0, Math.PI, TAU);
+  ctx.fill();
+
+  ctx.fillStyle = portrait.accent;
+  ctx.globalAlpha = 0.95;
+  ctx.beginPath();
+  ctx.roundRect(x - radius * 0.55, y - radius * 0.1, radius * 1.1, radius * 0.26, 6);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+
+  ctx.fillStyle = "#2b201b";
+  ctx.beginPath();
+  ctx.arc(x - radius * 0.26, y - radius * 0.05, radius * 0.07, 0, TAU);
+  ctx.arc(x + radius * 0.26, y - radius * 0.05, radius * 0.07, 0, TAU);
+  ctx.fill();
+
+  ctx.strokeStyle = "#5f2c2f";
+  ctx.lineWidth = Math.max(2, radius * 0.08);
+  ctx.beginPath();
+  ctx.arc(x, y + radius * 0.28, radius * 0.22, 0.1, Math.PI - 0.1);
+  ctx.stroke();
+
+  ctx.fillStyle = "rgba(255,255,255,0.8)";
+  ctx.font = `900 ${Math.max(12, radius * 0.55)}px Trebuchet MS`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(portrait.label, x, y + radius * 0.62);
+}
+
 function drawProjectile(p) {
   ctx.save();
   if (p.kind === "beam") {
@@ -1392,9 +1657,15 @@ function drawProjectile(p) {
     ctx.stroke();
   } else {
     ctx.beginPath();
-    ctx.arc(0, 0, p.kind === "shell" ? 10 : 7, 0, TAU);
+    ctx.arc(0, 0, p.kind === "shell" || p.kind === "grenade" ? 10 : 7, 0, TAU);
     ctx.fill();
     ctx.stroke();
+    if (p.kind === "grenade") {
+      ctx.fillStyle = "#fff0a6";
+      ctx.beginPath();
+      ctx.arc(3, -3, 3, 0, TAU);
+      ctx.fill();
+    }
   }
   ctx.restore();
 }
@@ -1493,6 +1764,23 @@ ui.music.addEventListener("click", () => {
   }
 });
 ui.beginStage.addEventListener("click", closeStageMap);
+ui.scoreForm.addEventListener("submit", (evt) => {
+  evt.preventDefault();
+  const name = ui.playerName.value.trim() || "Player";
+  const killPct = state.runTotal ? Math.round((state.runKilled / state.runTotal) * 100) : 0;
+  const scores = loadLeaderboard();
+  scores.push({
+    name,
+    score: state.finalScore,
+    killPct,
+    date: new Date().toISOString(),
+  });
+  scores.sort((a, b) => b.score - a.score);
+  saveLeaderboard(scores);
+  ui.scoreForm.classList.add("hidden");
+  renderLeaderboard(scores.slice(0, 10));
+  showToast("Score saved to the leaderboard");
+});
 ui.restart.addEventListener("click", () => {
   state.stageIndex = 0;
   state.maxStage = 0;

@@ -26,6 +26,15 @@
             <p class="kicker" id="endKicker">The meadow needs another try</p>
             <h2 id="endTitle">Game Over</h2>
             <p id="endText">Too many creatures reached the gate.</p>
+            <div id="finalStats" class="final-stats hidden"></div>
+            <form id="scoreForm" class="score-form hidden">
+              <label for="playerName">Top 10 score! Enter your name</label>
+              <div>
+                <input id="playerName" maxlength="18" autocomplete="off" placeholder="Player name" />
+                <button class="primary" type="submit">Save</button>
+              </div>
+            </form>
+            <div id="leaderboard" class="leaderboard hidden"></div>
             <button id="restart" class="primary">Restart Adventure</button>
           </div>
         </div>

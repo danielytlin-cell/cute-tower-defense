@@ -40,6 +40,11 @@ const W = 1280;
 const H = 760;
 const TAU = Math.PI * 2;
 const LEADERBOARD_KEY = "bloomguard.leaderboard.v1";
+const ENEMY_HP_MULTIPLIER = 1.2;
+const ENEMY_REWARD_MULTIPLIER = 0.5;
+// Optional shared leaderboard endpoint. GitHub Pages is static, so cross-computer
+// scores need an external API. Set this to your backend URL when one is ready.
+const LEADERBOARD_API_URL = "https://bloomguard-leaderboard.daniel-ytlin.workers.dev/";
 const enemyPortraitFiles = [
   "assets/enemy-1.png",
   "assets/enemy-2.png",
@@ -490,15 +495,40 @@ function calculateFinalScore() {
   );
 }
 
-function loadLeaderboard() {
+function sortTopScores(scores) {
+  return scores
+    .filter((s) => s && s.name && Number.isFinite(s.score))
+    .map(normalizeScoreEntry)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 10);
+}
+
+function loadLocalLeaderboard() {
   try {
     const scores = JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || "[]");
-    return Array.isArray(scores)
-      ? scores.filter((s) => s && s.name && Number.isFinite(s.score)).map(normalizeScoreEntry).sort((a, b) => b.score - a.score).slice(0, 10)
-      : [];
+    return Array.isArray(scores) ? sortTopScores(scores) : [];
   } catch {
     return [];
   }
+}
+
+async function loadLeaderboard() {
+  if (LEADERBOARD_API_URL) {
+    try {
+      const response = await fetch(LEADERBOARD_API_URL, { headers: { "Accept": "application/json" } });
+      if (!response.ok) throw new Error(`Leaderboard ${response.status}`);
+      const data = await response.json();
+      const remoteScores = Array.isArray(data) ? data : data.scores;
+      if (Array.isArray(remoteScores)) {
+        const scores = sortTopScores(remoteScores);
+        saveLocalLeaderboard(scores);
+        return scores;
+      }
+    } catch {
+      showToast("Using local scores. Shared leaderboard is unavailable.");
+    }
+  }
+  return loadLocalLeaderboard();
 }
 
 function normalizeScoreEntry(entry) {
@@ -510,16 +540,45 @@ function normalizeScoreEntry(entry) {
   };
 }
 
-function saveLeaderboard(scores) {
+function saveLocalLeaderboard(scores) {
   localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(scores.slice(0, 10)));
 }
 
-function isTopScore(score) {
-  const scores = loadLeaderboard();
+async function saveLeaderboardEntry(entry) {
+  if (LEADERBOARD_API_URL) {
+    try {
+      const response = await fetch(LEADERBOARD_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify(entry),
+      });
+      if (!response.ok) throw new Error(`Leaderboard ${response.status}`);
+      const data = await response.json().catch(() => null);
+      const remoteScores = Array.isArray(data) ? data : data?.scores;
+      const scores = Array.isArray(remoteScores)
+        ? sortTopScores(remoteScores)
+        : sortTopScores([...loadLocalLeaderboard(), entry]);
+      saveLocalLeaderboard(scores);
+      return scores;
+    } catch {
+      showToast("Shared save failed. Score saved on this device.");
+    }
+  }
+  const scores = sortTopScores([...loadLocalLeaderboard(), entry]);
+  saveLocalLeaderboard(scores);
+  return scores;
+}
+
+async function isTopScore(score) {
+  const scores = await loadLeaderboard();
   return scores.length < 10 || score > scores[scores.length - 1].score;
 }
 
-function renderLeaderboard(scores = loadLeaderboard()) {
+async function renderLeaderboard(scores) {
+  if (!scores) scores = await loadLeaderboard();
   const markup = leaderboardMarkup(scores);
   if (ui.leaderboard) {
     ui.leaderboard.classList.remove("hidden");
@@ -658,7 +717,7 @@ function startWave() {
 function spawnEnemy(type) {
   const base = enemyTypes[type];
   const stageScale = 1 + state.stageIndex * 0.22;
-  const hp = Math.round(base.hp * stageScale * (base.boss ? 1 + state.stageIndex * 0.15 : 1));
+  const hp = Math.round(base.hp * ENEMY_HP_MULTIPLIER * stageScale * (base.boss ? 1 + state.stageIndex * 0.15 : 1));
   const e = {
     id: `enemy-${nextEnemyId++}`,
     type,
@@ -666,7 +725,7 @@ function spawnEnemy(type) {
     hp,
     maxHp: hp,
     speed: base.speed * (1 + state.stageIndex * 0.035),
-    reward: Math.round(base.reward * (1 + state.stageIndex * 0.12)),
+    reward: Math.max(1, Math.round(base.reward * ENEMY_REWARD_MULTIPLIER * (1 + state.stageIndex * 0.12))),
     color: base.color,
     kind: base.kind,
     armor: base.armor || 0,
@@ -1081,11 +1140,12 @@ function endGame(won) {
       <div><span>Eliminated</span>${killPct}%</div>
     `;
     renderLeaderboard();
-    if (isTopScore(state.finalScore)) {
+    isTopScore(state.finalScore).then((topScore) => {
+      if (!topScore || state.gameEnded !== true) return;
       ui.scoreForm.classList.remove("hidden");
       ui.playerName.value = "";
       setTimeout(() => ui.playerName.focus(), 50);
-    }
+    });
   } else {
     ui.finalStats?.classList.add("hidden");
     renderLeaderboard();
@@ -1995,21 +2055,19 @@ ui.music.addEventListener("click", () => {
 ui.beginStage.addEventListener("click", closeStageMap);
 ui.towerTab?.addEventListener("click", () => showHudTab("towers"));
 ui.scoresTab?.addEventListener("click", () => showHudTab("scores"));
-ui.scoreForm.addEventListener("submit", (evt) => {
+ui.scoreForm.addEventListener("submit", async (evt) => {
   evt.preventDefault();
   const name = ui.playerName.value.trim() || "Player";
   const killPct = state.runTotal ? Math.round((state.runKilled / state.runTotal) * 100) : 0;
-  const scores = loadLeaderboard();
-  scores.push({
+  const entry = {
     name,
     score: state.finalScore,
     killPct,
     date: new Date().toISOString(),
-  });
-  scores.sort((a, b) => b.score - a.score);
-  saveLeaderboard(scores);
+  };
+  const scores = await saveLeaderboardEntry(entry);
   ui.scoreForm.classList.add("hidden");
-  renderLeaderboard(scores.slice(0, 10));
+  renderLeaderboard(scores);
   showToast("Score saved to the leaderboard");
 });
 ui.restart.addEventListener("click", () => {

@@ -113,8 +113,7 @@ canvas {
 }
 
 .stats div,
-.wave-card,
-.inspect {
+.wave-card {
   border: 2px solid #e8cf8f;
   border-radius: 8px;
   background: rgba(255, 255, 247, 0.74);
@@ -158,17 +157,44 @@ canvas {
 
 .tool-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
 
 .tool-row button {
-  min-height: 42px;
+  min-height: 44px;
   min-width: 0;
-  padding: 4px;
+  padding: 6px 4px;
   border-radius: 8px;
   background: #dff5ff;
   box-shadow: inset 0 -4px 0 #87cdd9;
+  line-height: 1.05;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.tool-row button.active {
+  outline: 3px solid var(--rose);
+  background: #ffe0df;
+  box-shadow: inset 0 -4px 0 #e99a93;
+}
+
+.hud-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.hud-tabs button {
+  min-height: 38px;
+  border-radius: 8px;
+  background: #fffdf0;
+  box-shadow: inset 0 -4px 0 rgba(222, 189, 113, 0.36);
+}
+
+.hud-tabs button.active {
+  outline: 3px solid #73c94a;
+  background: #efffda;
 }
 
 h1,
@@ -218,18 +244,6 @@ h2 {
   display: block;
   color: #6e7a58;
   font-size: 0.74rem;
-}
-
-.inspect {
-  min-height: 188px;
-  padding: 12px;
-  line-height: 1.35;
-}
-
-.inspect button {
-  width: 100%;
-  min-height: 38px;
-  margin-top: 10px;
 }
 
 .toast {
@@ -371,6 +385,29 @@ h2 {
 
 .leaderboard li {
   padding-left: 4px;
+}
+
+.leaderboard-entry {
+  display: grid;
+  gap: 2px;
+}
+
+.leaderboard-entry strong {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.leaderboard-entry small {
+  color: #6e7a58;
+}
+
+.leaderboard-compact {
+  margin: 0;
+}
+
+.leaderboard-compact ol {
+  padding-left: 22px;
 }
 
 @media (max-width: 980px) {

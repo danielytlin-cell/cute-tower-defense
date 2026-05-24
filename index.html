@@ -65,18 +65,23 @@
         <div class="tool-row">
           <button id="pause" title="Pause">Ⅱ</button>
           <button id="speed" title="Speed">1x</button>
+          <button id="removeTower" title="Remove tower">Remove</button>
           <button id="restartStage" title="Restart stage">Restart</button>
           <button id="music" title="Music">♪</button>
         </div>
 
-        <div>
+        <div class="hud-tabs" role="tablist" aria-label="Side panel">
+          <button id="towerTab" class="active" role="tab" aria-selected="true" aria-controls="towersPanel">Towers</button>
+          <button id="scoresTab" role="tab" aria-selected="false" aria-controls="leaderboardPanel">Scores</button>
+        </div>
+
+        <div id="towersPanel" class="tab-panel" role="tabpanel" aria-labelledby="towerTab">
           <h2>Towers</h2>
           <div id="towerButtons" class="tower-list"></div>
         </div>
 
-        <div id="inspect" class="inspect">
-          <h2>Build Spots</h2>
-          <p>Pick a tower, then tap a flagged stump. Select a tower to upgrade it and see its range.</p>
+        <div id="leaderboardPanel" class="tab-panel hidden" role="tabpanel" aria-labelledby="scoresTab">
+          <div id="leaderboardTab" class="leaderboard leaderboard-compact"></div>
         </div>
       </aside>
     </main>

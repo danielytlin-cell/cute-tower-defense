@@ -11,6 +11,7 @@ const ui = {
   startWave: document.getElementById("startWave"),
   pause: document.getElementById("pause"),
   speed: document.getElementById("speed"),
+  removeTower: document.getElementById("removeTower"),
   restartStage: document.getElementById("restartStage"),
   music: document.getElementById("music"),
   towerButtons: document.getElementById("towerButtons"),
@@ -27,6 +28,11 @@ const ui = {
   scoreForm: document.getElementById("scoreForm"),
   playerName: document.getElementById("playerName"),
   leaderboard: document.getElementById("leaderboard"),
+  leaderboardTab: document.getElementById("leaderboardTab"),
+  towerTab: document.getElementById("towerTab"),
+  scoresTab: document.getElementById("scoresTab"),
+  towersPanel: document.getElementById("towersPanel"),
+  leaderboardPanel: document.getElementById("leaderboardPanel"),
   restart: document.getElementById("restart"),
 };
 
@@ -76,9 +82,10 @@ const stageLayouts = [
     spots: [
       { x: 170, y: 78 }, { x: 294, y: 152 }, { x: 372, y: 333 }, { x: 490, y: 128 },
       { x: 620, y: 252 }, { x: 650, y: 465 }, { x: 800, y: 232 }, { x: 930, y: 560 },
-      { x: 1008, y: 312 }, { x: 1120, y: 610 }, { x: 225, y: 410 }, { x: 540, y: 560 },
+      { x: 1008, y: 312 }, { x: 1120, y: 610 }, { x: 190, y: 345 }, { x: 610, y: 455 },
       { x: 108, y: 265 }, { x: 448, y: 350 }, { x: 878, y: 330 }, { x: 1185, y: 420 },
       { x: 255, y: 365 }, { x: 735, y: 430 }, { x: 352, y: 180 }, { x: 980, y: 510 },
+      { x: 225, y: 210 }, { x: 545, y: 270 }, { x: 1095, y: 455 },
     ],
   },
   {
@@ -94,7 +101,8 @@ const stageLayouts = [
       { x: 545, y: 85 }, { x: 650, y: 285 }, { x: 795, y: 455 }, { x: 875, y: 235 },
       { x: 1035, y: 390 }, { x: 1135, y: 590 }, { x: 575, y: 510 }, { x: 1010, y: 645 },
       { x: 145, y: 535 }, { x: 360, y: 420 }, { x: 720, y: 255 }, { x: 960, y: 520 },
-      { x: 235, y: 185 }, { x: 805, y: 455 }, { x: 720, y: 160 }, { x: 1100, y: 430 },
+      { x: 235, y: 185 }, { x: 940, y: 460 }, { x: 720, y: 160 }, { x: 1100, y: 430 },
+      { x: 175, y: 365 }, { x: 505, y: 250 }, { x: 1045, y: 555 },
     ],
   },
   {
@@ -111,6 +119,7 @@ const stageLayouts = [
       { x: 970, y: 390 }, { x: 1125, y: 330 }, { x: 1160, y: 610 }, { x: 595, y: 575 },
       { x: 160, y: 365 }, { x: 400, y: 555 }, { x: 735, y: 315 }, { x: 1055, y: 505 },
       { x: 545, y: 455 }, { x: 880, y: 250 }, { x: 250, y: 175 }, { x: 925, y: 200 },
+      { x: 205, y: 315 }, { x: 610, y: 385 }, { x: 1085, y: 375 },
     ],
   },
   {
@@ -124,9 +133,10 @@ const stageLayouts = [
     spots: [
       { x: 150, y: 245 }, { x: 245, y: 70 }, { x: 345, y: 275 }, { x: 425, y: 470 },
       { x: 555, y: 405 }, { x: 645, y: 615 }, { x: 745, y: 425 }, { x: 820, y: 210 },
-      { x: 980, y: 250 }, { x: 1060, y: 610 }, { x: 1135, y: 395 }, { x: 545, y: 185 },
-      { x: 185, y: 360 }, { x: 505, y: 600 }, { x: 715, y: 260 }, { x: 980, y: 500 },
-      { x: 305, y: 420 }, { x: 885, y: 450 }, { x: 360, y: 260 }, { x: 1160, y: 600 },
+      { x: 980, y: 250 }, { x: 1110, y: 585 }, { x: 1135, y: 395 }, { x: 492, y: 303 },
+      { x: 185, y: 360 }, { x: 575, y: 585 }, { x: 780, y: 245 }, { x: 980, y: 500 },
+      { x: 305, y: 420 }, { x: 885, y: 450 }, { x: 303, y: 214 }, { x: 1160, y: 600 },
+      { x: 205, y: 205 }, { x: 525, y: 490 }, { x: 1030, y: 420 },
     ],
   },
   {
@@ -142,7 +152,8 @@ const stageLayouts = [
       { x: 515, y: 380 }, { x: 610, y: 150 }, { x: 705, y: 360 }, { x: 790, y: 535 },
       { x: 895, y: 320 }, { x: 1015, y: 470 }, { x: 1120, y: 610 }, { x: 610, y: 555 },
       { x: 145, y: 610 }, { x: 545, y: 205 }, { x: 835, y: 360 }, { x: 1015, y: 615 },
-      { x: 300, y: 390 }, { x: 735, y: 250 }, { x: 445, y: 185 }, { x: 1070, y: 430 },
+      { x: 300, y: 390 }, { x: 735, y: 250 }, { x: 445, y: 185 }, { x: 1120, y: 500 },
+      { x: 180, y: 470 }, { x: 560, y: 315 }, { x: 980, y: 545 },
     ],
   },
   {
@@ -155,10 +166,11 @@ const stageLayouts = [
     ],
     spots: [
       { x: 135, y: 355 }, { x: 210, y: 135 }, { x: 335, y: 355 }, { x: 395, y: 585 },
-      { x: 535, y: 360 }, { x: 640, y: 135 }, { x: 745, y: 330 }, { x: 850, y: 105 },
+      { x: 535, y: 360 }, { x: 640, y: 135 }, { x: 780, y: 375 }, { x: 850, y: 105 },
       { x: 925, y: 535 }, { x: 1045, y: 290 }, { x: 1140, y: 470 }, { x: 680, y: 585 },
       { x: 215, y: 305 }, { x: 500, y: 565 }, { x: 790, y: 135 }, { x: 1010, y: 505 },
       { x: 575, y: 290 }, { x: 900, y: 310 }, { x: 315, y: 160 }, { x: 770, y: 465 },
+      { x: 160, y: 260 }, { x: 610, y: 415 }, { x: 980, y: 365 },
     ],
   },
   {
@@ -175,6 +187,7 @@ const stageLayouts = [
       { x: 735, y: 355 }, { x: 795, y: 210 }, { x: 850, y: 380 }, { x: 955, y: 560 },
       { x: 1010, y: 345 }, { x: 1115, y: 520 }, { x: 1185, y: 455 }, { x: 230, y: 475 },
       { x: 360, y: 190 }, { x: 690, y: 465 }, { x: 875, y: 215 }, { x: 1045, y: 555 },
+      { x: 190, y: 275 }, { x: 520, y: 350 }, { x: 950, y: 430 },
     ],
   },
   {
@@ -191,6 +204,7 @@ const stageLayouts = [
       { x: 650, y: 300 }, { x: 720, y: 490 }, { x: 780, y: 315 }, { x: 845, y: 105 },
       { x: 925, y: 350 }, { x: 1010, y: 235 }, { x: 1110, y: 500 }, { x: 1175, y: 360 },
       { x: 205, y: 245 }, { x: 430, y: 430 }, { x: 760, y: 115 }, { x: 1065, y: 325 },
+      { x: 210, y: 410 }, { x: 560, y: 370 }, { x: 975, y: 300 },
     ],
   },
 ];
@@ -217,20 +231,20 @@ const towerTypes = {
     name: "Lightning", icon: "ϟ", color: "#d7b2ff", unlock: 4, cost: 130, range: 160,
     fireRate: 1.0, damage: 24, chains: 3, projectile: "bolt", targetsFlying: true, desc: "Chain zaps",
   },
-  fire: {
-    name: "Fire", icon: "♨", color: "#ff826f", unlock: 5, cost: 145, range: 142,
-    fireRate: 0.66, damage: 14, burn: 34, burnTime: 3.1, projectile: "fire", desc: "Fast burns",
-  },
   grenade: {
-    name: "Grenade", icon: "G", color: "#8fd16a", unlock: 4, cost: 160, range: 168,
-    fireRate: 1.08, damage: 82, splash: 130, projectile: "grenade", desc: "Huge blasts",
+    name: "Grenade", icon: "G", color: "#8fd16a", unlock: 4, cost: 175, range: 168,
+    fireRate: 1.08, damage: 78, splash: 115, projectile: "grenade", desc: "Huge blasts",
+  },
+  bomb: {
+    name: "Bomb", icon: "B", color: "#ffcf4f", unlock: 5, cost: 200, radius: 170,
+    damage: 520, consumable: true, desc: "Drop anywhere for massive blast damage",
   },
   crystal: {
     name: "Crystal", icon: "◆", color: "#79d6ff", unlock: 5, cost: 230, range: 190,
     fireRate: 0.38, damage: 20, beam: true, targetsFlying: true, desc: "Bright beam",
   },
   turret: {
-    name: "Turret", icon: "✚", color: "#bfc8b3", unlock: 6, cost: 190, range: 152,
+    name: "Turret", icon: "✚", color: "#bfc8b3", unlock: 6, cost: 175, range: 165,
     fireRate: 0.18, damage: 8, projectile: "pellet", targetsFlying: true, desc: "Rapid shots",
   },
 };
@@ -246,14 +260,14 @@ const enemyTypes = {
 };
 
 const stages = [
-  { name: "Sunny Stump", lives: 20, coins: 145, unlockText: "Archer towers ready", waves: [["sprout", 8], ["sprout", 12], ["sprout", 10, "skitter", 4], ["sprout", 18, "skitter", 8]] },
-  { name: "Pebble Bend", lives: 20, coins: 165, unlockText: "Cannon tower unlocked", waves: [["sprout", 12, "skitter", 8], ["skitter", 16], ["sprout", 18, "skitter", 12], ["brute", 4, "skitter", 16]] },
-  { name: "Frost Ferns", lives: 22, coins: 190, unlockText: "Frost tower unlocked", waves: [["brute", 7, "sprout", 14], ["shield", 7, "skitter", 12], ["brute", 9, "shield", 8], ["brute", 12, "shield", 10, "skitter", 18]] },
-  { name: "Skycap Grove", lives: 22, coins: 210, unlockText: "Lightning and grenade towers unlocked", waves: [["flyer", 10, "sprout", 12], ["flyer", 16, "skitter", 14], ["flyer", 18, "shield", 10], ["flyer", 24, "brute", 9, "shield", 10]] },
-  { name: "Castle Picnic", lives: 24, coins: 340, unlockText: "Fire and crystal towers unlocked", waves: [["elite", 4, "flyer", 8], ["shield", 16, "brute", 14], ["elite", 12, "flyer", 24], ["boss", 1, "elite", 14, "flyer", 18]] },
-  { name: "Gearflower Vale", lives: 24, coins: 300, unlockText: "Mechanical turret unlocked", waves: [["elite", 18, "flyer", 24], ["boss", 1, "shield", 24], ["elite", 28, "brute", 24, "flyer", 28], ["boss", 2, "elite", 24, "flyer", 34]] },
-  { name: "Boomcap Orchard", lives: 25, coins: 330, unlockText: "Boomcap boss waves unlocked", waves: [["shield", 18, "elite", 12], ["brute", 20, "flyer", 26], ["elite", 26, "shield", 24, "skitter", 24], ["boss", 2, "elite", 28, "flyer", 30]] },
-  { name: "Moonwheel Keep", lives: 26, coins: 360, unlockText: "Final keep defense", waves: [["elite", 30, "flyer", 32], ["boss", 2, "shield", 30, "brute", 22], ["elite", 36, "flyer", 40, "shield", 30], ["boss", 3, "elite", 34, "flyer", 44]] },
+  { name: "Sunny Stump", lives: 20, coins: 145, unlockText: "Archer towers ready", waves: [["sprout", 10], ["sprout", 15], ["sprout", 12, "skitter", 5], ["sprout", 22, "skitter", 10]] },
+  { name: "Pebble Bend", lives: 20, coins: 165, unlockText: "Cannon tower unlocked", waves: [["sprout", 15, "skitter", 10], ["skitter", 20], ["sprout", 22, "skitter", 15], ["brute", 5, "skitter", 20]] },
+  { name: "Frost Ferns", lives: 22, coins: 295, unlockText: "Frost tower unlocked", waves: [["brute", 3, "sprout", 12], ["shield", 9, "skitter", 15], ["brute", 11, "shield", 10], ["brute", 15, "shield", 12, "skitter", 22]] },
+  { name: "Skycap Grove", lives: 22, coins: 360, unlockText: "Lightning and grenade towers unlocked", waves: [["flyer", 4, "sprout", 10], ["flyer", 20, "skitter", 17], ["flyer", 22, "shield", 12], ["flyer", 29, "brute", 11, "shield", 12]] },
+  { name: "Castle Picnic", lives: 24, coins: 390, unlockText: "Bomb and crystal weapons unlocked", waves: [["elite", 4, "flyer", 8], ["shield", 20, "brute", 17], ["elite", 15, "flyer", 29], ["boss", 2, "elite", 17, "flyer", 24]] },
+  { name: "Gearflower Vale", lives: 24, coins: 535, unlockText: "Mechanical turret unlocked", waves: [["elite", 8, "flyer", 10], ["boss", 2, "shield", 27], ["elite", 32, "brute", 27, "flyer", 32], ["boss", 3, "elite", 29, "flyer", 44]] },
+  { name: "Boomcap Orchard", lives: 25, coins: 410, unlockText: "Boomcap boss waves unlocked", waves: [["shield", 22, "elite", 12], ["brute", 24, "flyer", 32], ["elite", 32, "shield", 29, "skitter", 29], ["boss", 3, "elite", 36, "flyer", 32]] },
+  { name: "Moonwheel Keep", lives: 26, coins: 590, unlockText: "Final keep defense", waves: [["elite", 17, "flyer", 17], ["boss", 3, "shield", 34, "brute", 24], ["elite", 41, "flyer", 36, "shield", 34], ["boss", 4, "elite", 41, "flyer", 41]] },
 ];
 
 const state = {
@@ -265,6 +279,7 @@ const state = {
   selectedTowerType: "archer",
   selectedTower: null,
   placing: true,
+  removeMode: false,
   towers: [],
   enemies: [],
   projectiles: [],
@@ -479,11 +494,20 @@ function loadLeaderboard() {
   try {
     const scores = JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || "[]");
     return Array.isArray(scores)
-      ? scores.filter((s) => s && s.name && Number.isFinite(s.score)).sort((a, b) => b.score - a.score).slice(0, 10)
+      ? scores.filter((s) => s && s.name && Number.isFinite(s.score)).map(normalizeScoreEntry).sort((a, b) => b.score - a.score).slice(0, 10)
       : [];
   } catch {
     return [];
   }
+}
+
+function normalizeScoreEntry(entry) {
+  return {
+    name: entry.name,
+    score: entry.score,
+    killPct: Number.isFinite(entry.killPct) ? entry.killPct : 0,
+    date: entry.date || entry.timestamp || "",
+  };
 }
 
 function saveLeaderboard(scores) {
@@ -496,12 +520,50 @@ function isTopScore(score) {
 }
 
 function renderLeaderboard(scores = loadLeaderboard()) {
-  if (!ui.leaderboard) return;
-  ui.leaderboard.classList.remove("hidden");
+  const markup = leaderboardMarkup(scores);
+  if (ui.leaderboard) {
+    ui.leaderboard.classList.remove("hidden");
+    ui.leaderboard.innerHTML = markup;
+  }
+  if (ui.leaderboardTab) ui.leaderboardTab.innerHTML = markup;
+}
+
+function showHudTab(tab) {
+  const showingScores = tab === "scores";
+  ui.towerTab?.classList.toggle("active", !showingScores);
+  ui.scoresTab?.classList.toggle("active", showingScores);
+  ui.towerTab?.setAttribute("aria-selected", String(!showingScores));
+  ui.scoresTab?.setAttribute("aria-selected", String(showingScores));
+  ui.towersPanel?.classList.toggle("hidden", showingScores);
+  ui.leaderboardPanel?.classList.toggle("hidden", !showingScores);
+  if (showingScores) renderLeaderboard();
+}
+
+function leaderboardMarkup(scores) {
   const rows = scores.length
-    ? scores.map((entry) => `<li><strong>${escapeHtml(entry.name)}</strong> - ${entry.score.toLocaleString()} <small>${entry.killPct}% eliminated</small></li>`).join("")
+    ? scores.map((entry) => `
+      <li>
+        <span class="leaderboard-entry">
+          <strong><span>${escapeHtml(entry.name)}</span><span>${entry.score.toLocaleString()}</span></strong>
+          <small>${entry.killPct}% eliminated · ${formatScoreDate(entry.date)}</small>
+        </span>
+      </li>
+    `).join("")
     : "<li>No champions yet</li>";
-  ui.leaderboard.innerHTML = `<h3>Leaderboard by Score</h3><ol>${rows}</ol>`;
+  return `<h3>Top 10 Scores</h3><ol>${rows}</ol>`;
+}
+
+function formatScoreDate(value) {
+  if (!value) return "No timestamp";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "No timestamp";
+  return date.toLocaleString([], {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
 function escapeHtml(value) {
@@ -538,6 +600,7 @@ function resetForStage(index) {
   state.selectedTower = null;
   state.selectedTowerType = availableTowers()[0][0];
   state.placing = true;
+  state.removeMode = false;
   state.gameEnded = false;
   state.paused = false;
   ui.gameOver.classList.add("hidden");
@@ -661,8 +724,61 @@ function addFloater(x, y, text, color = "#ffffff") {
   state.floaters.push({ x, y, text, color, life: 1, max: 1 });
 }
 
+function explosionVisual(x, y, radius, color = "#ffb13b") {
+  state.particles.push({ type: "ring", x, y, color: "#fff0a6", radius, life: 0.42, max: 0.42, r: 0 });
+  state.particles.push({ type: "ring", x, y, color, radius: radius * 0.62, life: 0.32, max: 0.32, r: 0 });
+  burst(x, y, 42, color);
+  burst(x, y, 24, "#5b4935");
+}
+
+function damageArea(x, y, radius, damage, source = "magic") {
+  let hits = 0;
+  for (const e of [...state.enemies]) {
+    const d = dist({ x, y }, e);
+    if (d <= radius) {
+      const falloff = 0.58 + 0.42 * (1 - d / radius);
+      damageEnemy(e, damage * falloff, source);
+      hits++;
+    }
+  }
+  return hits;
+}
+
+function dropBomb(p) {
+  const def = towerTypes.bomb;
+  if (state.coins < def.cost) {
+    showToast("Not enough coins for a bomb");
+    return;
+  }
+  state.coins -= def.cost;
+  state.projectiles.push({
+    kind: "bombDrop",
+    x: p.x - 34,
+    y: -40,
+    tx: p.x,
+    ty: p.y,
+    life: 0.38,
+    max: 0.38,
+    damage: def.damage,
+    radius: def.radius,
+    color: def.color,
+  });
+  state.selectedTower = null;
+  state.placing = true;
+  audio.sfx("wave");
+  addFloater(p.x, p.y - 18, "-200", "#ffdf79");
+  updateUi();
+}
+
+function explodeBomb(x, y, radius, damage, color = "#ffcf4f") {
+  damageArea(x, y, radius, damage, "magic");
+  explosionVisual(x, y, radius, color);
+  audio.sfx("cannon");
+}
+
 function placeTower(spot, type) {
   const def = towerTypes[type];
+  if (def.consumable) return;
   if (state.coins < def.cost) {
     showToast("Not enough coins yet");
     return;
@@ -791,8 +907,10 @@ function hitProjectile(p) {
   const y = p.target.y;
   if (p.splash) {
     for (const e of [...state.enemies]) {
-      if (dist({ x, y }, e) <= p.splash) {
-        damageEnemy(e, p.damage, p.source);
+      const d = dist({ x, y }, e);
+      if (d <= p.splash) {
+        const splashFalloff = p.kind === "grenade" ? 0.68 + 0.32 * (1 - d / p.splash) : 1;
+        damageEnemy(e, p.damage * splashFalloff, p.source);
         if (p.slow) {
           e.slow = p.slow;
           e.slowTimer = p.slowTime;
@@ -803,7 +921,12 @@ function hitProjectile(p) {
         }
       }
     }
-    burst(x, y, p.kind === "frost" ? 24 : p.kind === "grenade" ? 30 : 18, p.color);
+    if (p.kind === "grenade") {
+      explosionVisual(x, y, p.splash, p.color);
+      audio.sfx("cannon");
+    } else {
+      burst(x, y, p.kind === "frost" ? 24 : 18, p.color);
+    }
   } else {
     damageEnemy(p.target, p.damage, p.source);
     if (p.burn) {
@@ -869,6 +992,18 @@ function update(dt) {
   }
 
   for (const p of [...state.projectiles]) {
+    if (p.kind === "bombDrop") {
+      p.life -= step;
+      const t = 1 - clamp(p.life / p.max, 0, 1);
+      p.x += (p.tx - p.x) * Math.min(1, step * 7);
+      p.y = -40 + (p.ty + 40) * t * t;
+      p.angle = t * TAU * 1.6;
+      if (p.life <= 0) {
+        explodeBomb(p.tx, p.ty, p.radius, p.damage, p.color);
+        state.projectiles = state.projectiles.filter((x) => x !== p);
+      }
+      continue;
+    }
     if (p.kind === "beam") {
       p.life -= step;
       if (p.life <= 0) state.projectiles = state.projectiles.filter((x) => x !== p);
@@ -890,9 +1025,11 @@ function update(dt) {
 
   for (const fx of [...state.particles]) {
     fx.life -= step;
-    fx.x += fx.vx * step;
-    fx.y += fx.vy * step;
-    fx.vy += 120 * step;
+    if (fx.type !== "ring") {
+      fx.x += fx.vx * step;
+      fx.y += fx.vy * step;
+      fx.vy += 120 * step;
+    }
     if (fx.life <= 0) state.particles = state.particles.filter((x) => x !== fx);
   }
   for (const f of [...state.floaters]) {
@@ -973,6 +1110,7 @@ function updateUi() {
   ui.restartStage.disabled = state.stagePicker || state.gameEnded;
   ui.pause.textContent = state.paused ? "▶" : "Ⅱ";
   ui.speed.textContent = `${state.speed}x`;
+  if (ui.removeTower) ui.removeTower.classList.toggle("active", state.removeMode);
   renderTowerButtons();
   renderInspect();
 }
@@ -982,7 +1120,7 @@ function renderTowerButtons() {
   for (const [key, def] of Object.entries(towerTypes)) {
     const unlocked = def.unlock <= state.stageIndex + 1;
     const btn = document.createElement("button");
-    btn.className = `tower-btn ${state.placing && state.selectedTowerType === key ? "active" : ""}`;
+    btn.className = `tower-btn ${state.placing && !state.removeMode && state.selectedTowerType === key ? "active" : ""}`;
     btn.disabled = !unlocked;
     btn.innerHTML = `
       <span class="tower-icon" style="background:${def.color}">${def.icon}</span>
@@ -993,6 +1131,7 @@ function renderTowerButtons() {
       state.selectedTower = null;
       state.selectedTowerType = key;
       state.placing = true;
+      state.removeMode = false;
       updateUi();
     });
     ui.towerButtons.appendChild(btn);
@@ -1000,6 +1139,7 @@ function renderTowerButtons() {
 }
 
 function renderInspect() {
+  if (!ui.inspect) return;
   if (state.selectedTower) {
     const t = state.selectedTower;
     const def = towerTypes[t.type];
@@ -1016,6 +1156,13 @@ function renderInspect() {
     document.getElementById("sell").addEventListener("click", () => sellTower(t));
   } else {
     const def = towerTypes[state.selectedTowerType];
+    if (def.consumable) {
+      ui.inspect.innerHTML = `
+        <h2>${def.name}</h2>
+        <p>${def.desc}. Cost ${def.cost}. Click anywhere on the map to drop one bomb.</p>
+      `;
+      return;
+    }
     ui.inspect.innerHTML = `
       <h2>${def.name}</h2>
       <p>${def.desc}. Cost ${def.cost}. Place it on any glowing stump flag.</p>
@@ -1059,6 +1206,19 @@ function screenToGame(evt) {
 function handlePointer(evt) {
   const p = screenToGame(evt);
   state.mouse = p;
+  if (state.removeMode) {
+    const towerToRemove = state.towers.find((t) => dist(t, p) < 34);
+    if (towerToRemove) {
+      sellTower(towerToRemove);
+      showToast("Tower removed");
+    }
+    return;
+  }
+  const selectedDef = towerTypes[state.selectedTowerType];
+  if (state.placing && selectedDef?.consumable) {
+    dropBomb(p);
+    return;
+  }
   const clickedTower = state.towers.find((t) => dist(t, p) < 34);
   if (clickedTower) {
     state.selectedTower = clickedTower;
@@ -1641,6 +1801,23 @@ function drawProjectile(p) {
     ctx.restore();
     return;
   }
+  if (p.kind === "bombDrop") {
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.angle || 0);
+    ctx.fillStyle = "#2f2b25";
+    ctx.strokeStyle = "#fff0a6";
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(0, 0, 17, 0, TAU);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = "#ffcf4f";
+    ctx.beginPath();
+    ctx.arc(6, -7, 5, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+    return;
+  }
   ctx.translate(p.x, p.y);
   ctx.rotate(p.angle || 0);
   ctx.fillStyle = p.color;
@@ -1674,10 +1851,24 @@ function drawEffects() {
   for (const fx of state.particles) {
     ctx.save();
     ctx.globalAlpha = clamp(fx.life / fx.max, 0, 1);
-    ctx.fillStyle = fx.color;
-    ctx.beginPath();
-    ctx.arc(fx.x, fx.y, fx.r, 0, TAU);
-    ctx.fill();
+    if (fx.type === "ring") {
+      const t = 1 - clamp(fx.life / fx.max, 0, 1);
+      ctx.strokeStyle = fx.color;
+      ctx.lineWidth = 8 * (1 - t) + 2;
+      ctx.beginPath();
+      ctx.arc(fx.x, fx.y, fx.radius * t, 0, TAU);
+      ctx.stroke();
+      ctx.fillStyle = fx.color;
+      ctx.globalAlpha *= 0.16 * (1 - t);
+      ctx.beginPath();
+      ctx.arc(fx.x, fx.y, fx.radius * t, 0, TAU);
+      ctx.fill();
+    } else {
+      ctx.fillStyle = fx.color;
+      ctx.beginPath();
+      ctx.arc(fx.x, fx.y, fx.r, 0, TAU);
+      ctx.fill();
+    }
     ctx.restore();
   }
   for (const f of state.floaters) {
@@ -1704,13 +1895,44 @@ function draw() {
 
   if (state.placing && !state.stagePicker) {
     const def = towerTypes[state.selectedTowerType];
-    const spot = buildSpots.find((s) => !s.tower && dist(s, state.mouse) < 34);
-    if (spot) {
+    if (def?.consumable && state.mouse) {
       ctx.save();
       ctx.globalAlpha = 0.18;
       ctx.fillStyle = def.color;
       ctx.beginPath();
-      ctx.arc(spot.x, spot.y, def.range, 0, TAU);
+      ctx.arc(state.mouse.x, state.mouse.y, def.radius, 0, TAU);
+      ctx.fill();
+      ctx.globalAlpha = 0.72;
+      ctx.strokeStyle = def.color;
+      ctx.lineWidth = 4;
+      ctx.setLineDash([10, 8]);
+      ctx.stroke();
+      ctx.restore();
+    } else {
+      const spot = buildSpots.find((s) => !s.tower && dist(s, state.mouse) < 34);
+      if (spot) {
+        ctx.save();
+        ctx.globalAlpha = 0.18;
+        ctx.fillStyle = def.color;
+        ctx.beginPath();
+        ctx.arc(spot.x, spot.y, def.range, 0, TAU);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+  }
+
+  if (state.removeMode && !state.stagePicker) {
+    const towerToRemove = state.towers.find((t) => dist(t, state.mouse) < 34);
+    if (towerToRemove) {
+      ctx.save();
+      ctx.strokeStyle = "#e96b73";
+      ctx.lineWidth = 5;
+      ctx.setLineDash([8, 6]);
+      ctx.beginPath();
+      ctx.arc(towerToRemove.x, towerToRemove.y, 42, 0, TAU);
+      ctx.stroke();
+      ctx.fillStyle = "rgba(233, 107, 115, 0.16)";
       ctx.fill();
       ctx.restore();
     }
@@ -1750,7 +1972,14 @@ window.addEventListener("keydown", (evt) => {
   updateUi();
 });
 ui.speed.addEventListener("click", () => {
-  state.speed = state.speed === 1 ? 2 : state.speed === 2 ? 3 : 1;
+  state.speed = state.speed === 1 ? 2 : state.speed === 2 ? 3 : state.speed === 3 ? 4 : 1;
+  updateUi();
+});
+ui.removeTower?.addEventListener("click", () => {
+  state.removeMode = !state.removeMode;
+  state.selectedTower = null;
+  state.placing = !state.removeMode;
+  showToast(state.removeMode ? "Remove mode: click a tower on the map" : "Remove mode off");
   updateUi();
 });
 ui.restartStage.addEventListener("click", restartCurrentStage);
@@ -1764,6 +1993,8 @@ ui.music.addEventListener("click", () => {
   }
 });
 ui.beginStage.addEventListener("click", closeStageMap);
+ui.towerTab?.addEventListener("click", () => showHudTab("towers"));
+ui.scoresTab?.addEventListener("click", () => showHudTab("scores"));
 ui.scoreForm.addEventListener("submit", (evt) => {
   evt.preventDefault();
   const name = ui.playerName.value.trim() || "Player";
@@ -1797,5 +2028,6 @@ window.addEventListener("resize", resize);
 resize();
 resetRunStats();
 resetForStage(0);
+renderLeaderboard();
 openStageMap();
 requestAnimationFrame(loop);
